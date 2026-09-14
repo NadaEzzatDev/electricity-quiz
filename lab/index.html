@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electricity Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="onboarding" class="onboarding-overlay">
+    <div class="onboarding-bg" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+      <span class="blob blob-3"></span>
+      <span class="circuit-lines"></span>
+      <span class="spark" style="--x:8%; --y:18%; --d:0s;"></span>
+      <span class="spark" style="--x:22%; --y:72%; --d:.6s;"></span>
+      <span class="spark" style="--x:88%; --y:14%; --d:1.1s;"></span>
+      <span class="spark" style="--x:78%; --y:82%; --d:.3s;"></span>
+      <span class="spark" style="--x:50%; --y:8%; --d:1.6s;"></span>
+      <span class="spark" style="--x:12%; --y:48%; --d:2s;"></span>
+      <span class="spark" style="--x:92%; --y:52%; --d:.9s;"></span>
+      <span class="spark" style="--x:65%; --y:92%; --d:1.4s;"></span>
+      <span class="spark" style="--x:40%; --y:88%; --d:.2s;"></span>
+      <span class="spark" style="--x:30%; --y:6%; --d:1.8s;"></span>
+    </div>
+
+    <div class="onboarding-card">
+      <div class="steam-heading">
+        <span class="steam-word"><span>S</span><span>T</span><span>E</span><span>A</span><span>M</span></span>
+        <span class="steam-caption">Science · Technology · Engineering · Arts · Math</span>
+      </div>
+
+      <div id="onboarding-step-name" class="onboarding-step">
+        <span class="onboarding-mascot">⚡</span>
+        <h1 class="onboarding-title">Electricity Lab</h1>
+        <p class="onboarding-tagline">Build circuits. Break things (safely). Understand electricity.</p>
+        <label class="onboarding-label" for="student-name-input">What's your name?</label>
+        <form id="onboarding-name-form" autocomplete="off">
+          <input id="student-name-input" class="onboarding-input" type="text" placeholder="Type your name..." maxlength="24" />
+          <button type="submit" class="onboarding-btn primary">Next →</button>
+        </form>
+      </div>
+
+      <div id="onboarding-step-welcome" class="onboarding-step" hidden>
+        <span class="onboarding-mascot">👋</span>
+        <h1 class="onboarding-title" id="onboarding-hello">Hello there!</h1>
+        <p class="onboarding-tagline">Here's how the lab works:</p>
+        <ul class="onboarding-instructions">
+          <li style="--i:0"><span class="oi-icon">🧩</span><span>Tap a toolbar button to add a part — it wires itself into the circuit automatically.</span></li>
+          <li style="--i:1"><span class="oi-icon">⚙️</span><span>Tap any part in the circuit to tweak its value, connect it, or remove it.</span></li>
+          <li style="--i:2"><span class="oi-icon">🎚️</span><span>Drag the sliders to change voltage and resistance — the dashboard updates live.</span></li>
+          <li style="--i:3"><span class="oi-icon">🔌</span><span>Flip the switch to open or close the circuit and watch the current flow.</span></li>
+          <li style="--i:4"><span class="oi-icon">🏆</span><span>Try <strong>Quest Mode</strong> for level-by-level challenges, or stay in <strong>Sandbox Mode</strong> to experiment freely.</span></li>
+        </ul>
+        <button id="onboarding-enter-btn" class="onboarding-btn primary big">Enter the Lab ⚡</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bg-glow" class="bg-glow" aria-hidden="true"></div>
+  <div id="toast-layer" class="toast-layer" aria-live="polite"></div>
+  <div id="levelup-overlay" class="levelup-overlay" hidden></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <span id="mascot" class="mascot">⚡</span>
+      <div>
+        <h1>Electricity Lab</h1>
+        <p class="brand-sub">Build it. Break it. Figure out why. ✨</p>
+      </div>
+    </div>
+
+    <div class="dashboard" role="group" aria-label="Live electrical readings">
+      <div class="stat-card stat-voltage">
+        <span class="stat-icon">🔋</span>
+        <span class="stat-label">Voltage</span>
+        <span class="stat-value" id="stat-voltage">6 V</span>
+      </div>
+      <div class="stat-card stat-current">
+        <span class="stat-icon">🌊</span>
+        <span class="stat-label">Current</span>
+        <span class="stat-value" id="stat-current">0 mA</span>
+      </div>
+      <div class="stat-card stat-resistance">
+        <span class="stat-icon">🚧</span>
+        <span class="stat-label">Resistance</span>
+        <span class="stat-value" id="stat-resistance">100 Ω</span>
+      </div>
+      <div class="stat-card stat-power">
+        <span class="stat-icon">🔥</span>
+        <span class="stat-label">Power</span>
+        <span class="stat-value" id="stat-power">0 W</span>
+      </div>
+      <div class="status-badge status-open" id="status-badge">🔌 Open Circuit</div>
+    </div>
+
+    <div class="header-controls">
+      <div id="player-badge" class="player-badge" hidden>
+        <span class="player-icon">👤</span>
+        <span id="player-name">Explorer</span>
+      </div>
+      <div class="score-badge" title="Challenges completed">
+        <span class="score-star">⭐</span>
+        <span id="score-value">0</span><span class="score-max">/6</span>
+      </div>
+      <button id="sound-toggle" class="icon-round-btn" aria-label="Toggle sound" title="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <div id="device-hint" class="device-hint" role="status">
+    <span class="device-hint-icon">💻</span>
+    <div class="device-hint-text">
+      <strong>Tip: use a computer for the best experience.</strong>
+      <span>Electricity Lab's sliders, wiring, and circuit view are built for a bigger screen — everything's easier to see and click on a laptop or desktop.</span>
+    </div>
+    <button id="device-hint-close" class="device-hint-close" aria-label="Dismiss tip">✕</button>
+  </div>
+
+  <nav class="mode-tabs" role="tablist" aria-label="Lab mode">
+    <div class="mode-tab-slider" id="mode-tab-slider"></div>
+    <button id="mode-free-btn" class="mode-tab active" role="tab" aria-selected="true">🧪 Sandbox Mode</button>
+    <button id="mode-challenge-btn" class="mode-tab" role="tab" aria-selected="false">🏆 Quest Mode</button>
+  </nav>
+
+  <main class="app-main">
+    <section class="workspace-card">
+      <div id="workspace-wrap" class="workspace-wrap">
+        <svg id="circuit-svg" viewBox="0 0 680 300" preserveAspectRatio="xMidYMid meet" role="img"
+             aria-label="Circuit workspace"></svg>
+      </div>
+
+      <div class="toolbar" role="toolbar" aria-label="Add components">
+        <button class="toolbar-btn tb-battery" data-add="battery" title="Add Battery">
+          <span class="toolbar-icon">🔋</span><span>Battery</span>
+        </button>
+        <button class="toolbar-btn tb-resistor" data-add="resistor" title="Add Resistor">
+          <span class="toolbar-icon">🧯</span><span>Resistor</span>
+        </button>
+        <button class="toolbar-btn tb-led" data-add="led" title="Add LED">
+          <span class="toolbar-icon">💡</span><span>LED</span>
+        </button>
+        <button class="toolbar-btn tb-switch" data-add="switch" title="Add Switch">
+          <span class="toolbar-icon">🔘</span><span>Switch</span>
+        </button>
+        <button class="toolbar-btn tb-wire" data-add="wire" title="Add Wire">
+          <span class="toolbar-icon">➖</span><span>Wire</span>
+        </button>
+      </div>
+      <p class="workspace-hint">👉 Tap any part in the circuit to tweak it, connect it, or yank it out.</p>
+    </section>
+
+    <aside class="side-column">
+      <div id="side-panel" class="side-panel">
+        <div class="side-panel-header">
+          <span>⚙️ Component Settings</span>
+          <button id="side-panel-close" class="icon-btn" aria-label="Close">✕</button>
+        </div>
+        <div id="side-panel-body" class="side-panel-body"></div>
+      </div>
+
+      <div id="free-panel" class="mode-panel">
+        <h2>🧪 Sandbox Mode</h2>
+        <p class="mode-panel-desc">Add parts, flip switches, drag sliders — go wild, nothing here can actually hurt you.</p>
+        <div class="suggestion-card">
+          <p id="suggestion-text" class="suggestion-text">Try increasing the voltage.</p>
+          <button id="new-suggestion-btn" class="panel-btn">🔁 Give me another idea</button>
+        </div>
+      </div>
+
+      <div id="challenge-panel" class="mode-panel" hidden>
+        <h2>🏆 Quest Mode</h2>
+        <p class="mode-panel-desc">Clear each level to unlock the next. Collect all 6 stars!</p>
+        <div id="challenge-list" class="challenge-list"></div>
+        <p id="challenge-goal" class="challenge-goal">Goal</p>
+        <div class="challenge-actions">
+          <button id="challenge-hint-btn" class="panel-btn">💭 Hint</button>
+          <button id="challenge-reset-btn" class="panel-btn">↺ Reset</button>
+        </div>
+        <p id="challenge-hint-text" class="panel-info" hidden></p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    <p>Predict → Build → Change → Observe → Understand — that's how real electrical engineers play, too. ⚡</p>
+  </footer>
+
+  <script src="js/components.js"></script>
+  <script src="js/circuit.js"></script>
+  <script src="js/simulation.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/challenges.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

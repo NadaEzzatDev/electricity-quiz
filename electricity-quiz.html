@@ -133,58 +133,6 @@
     color:var(--muted);
   }
 
-  .choice-row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-  }
-
-  .choice-card{
-    appearance:none;
-    cursor:pointer;
-    text-align:left;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:22px 20px;
-    border-radius:18px;
-    border:2px solid var(--card-border);
-    background:rgba(255,255,255,0.05);
-    color:var(--text);
-    font-family:'Nunito', sans-serif;
-    transition:border-color .15s, background .15s, transform .1s;
-  }
-  .choice-card:hover{
-    border-color:var(--accent);
-    background:rgba(0,229,255,0.08);
-    transform:translateY(-2px);
-  }
-  .choice-emoji{font-size:2.2rem;}
-  .choice-title{
-    font-family:'Baloo 2', sans-serif;
-    font-weight:700;
-    font-size:1.15rem;
-  }
-  .choice-desc{
-    color:var(--muted);
-    font-size:0.88rem;
-    line-height:1.5;
-  }
-  .choice-cta{
-    margin-top:6px;
-    font-family:'Baloo 2', sans-serif;
-    font-weight:700;
-    font-size:0.9rem;
-    background:linear-gradient(90deg, var(--accent), var(--accent-2));
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-  }
-
-  @media (max-width:560px){
-    .choice-row{grid-template-columns:1fr;}
-  }
-
   label{
     display:block;
     font-weight:800;
@@ -517,35 +465,8 @@
 <div class="app">
   <div class="card">
 
-    <!-- SCREEN 0: LANDING / CHOOSE ACTIVITY -->
-    <section id="screen-landing" class="screen active">
-      <div class="badge-row">
-        <span class="badge">⚡ STEAM Class</span>
-        <span class="badge">🔋 V · I · R</span>
-        <span class="badge">💡 LEDs & Ohm's Law</span>
-      </div>
-      <h1>Electricity Fundamentals</h1>
-      <p class="subtitle">Choose what you'd like to do first ⚡</p>
-
-      <div class="choice-row">
-        <button type="button" class="choice-card" id="choice-quiz-btn">
-          <span class="choice-emoji">📝</span>
-          <span class="choice-title">Take the Quiz</span>
-          <span class="choice-desc">10 quick questions to test what you know about voltage, current, resistance, LEDs, and Ohm's Law. Get instant feedback and see your score at the end.</span>
-          <span class="choice-cta">Start the quiz →</span>
-        </button>
-
-        <button type="button" class="choice-card" id="choice-lab-btn">
-          <span class="choice-emoji">🧪</span>
-          <span class="choice-title">Electricity Lab</span>
-          <span class="choice-desc">Build real circuits with batteries, resistors, LEDs, and switches. Drag sliders, flip switches, and watch current flow — free Sandbox Mode or level-by-level Quest Mode.</span>
-          <span class="choice-cta">Open the lab →</span>
-        </button>
-      </div>
-    </section>
-
     <!-- SCREEN 1: NAME ENTRY -->
-    <section id="screen-name" class="screen">
+    <section id="screen-name" class="screen active">
       <div class="badge-row">
         <span class="badge">⚡ 10 Questions</span>
         <span class="badge">🔋 V · I · R</span>
@@ -695,16 +616,10 @@
 
   const TOTAL = QUESTIONS.length;
 
-  /* ---------------- GOOGLE FORM CONFIG ----------------
-     Fill these in after creating your Google Form (see setup instructions).
-     Leave GOOGLE_FORM_ID as-is and results simply won't be sent anywhere. */
-  const GOOGLE_FORM_ID = "PASTE_YOUR_GOOGLE_FORM_ID_HERE";
-  const FORM_ENTRY_IDS = {
-    name: "PASTE_ENTRY_ID_FOR_NAME_HERE",
-    grade: "PASTE_ENTRY_ID_FOR_GRADE_HERE",
-    score: "PASTE_ENTRY_ID_FOR_SCORE_HERE",
-    timeTaken: "PASTE_ENTRY_ID_FOR_TIME_HERE"
-  };
+  /* ---------------- GOOGLE SHEET CONFIG ----------------
+     Paste your Apps Script Web App URL below (see setup instructions).
+     Leave it as-is and results simply won't be sent anywhere. */
+  const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby1bnbEPoPvjz9ak68sFeWqwCiuB7y3mZZ8xPSshoJu79hkagTXAB6KQj02BRWMziljCg/exec";
 
   /* ---------------- STATE ---------------- */
   let studentName = "";
@@ -716,13 +631,9 @@
   let quizStartTime = 0;
 
   /* ---------------- DOM REFS ---------------- */
-  const screenLanding = document.getElementById('screen-landing');
   const screenName = document.getElementById('screen-name');
   const screenQuiz = document.getElementById('screen-quiz');
   const screenResults = document.getElementById('screen-results');
-
-  const choiceQuizBtn = document.getElementById('choice-quiz-btn');
-  const choiceLabBtn = document.getElementById('choice-lab-btn');
 
   const nameInput = document.getElementById('student-name');
   const nameError = document.getElementById('name-error');
@@ -749,19 +660,9 @@
   const restartNameBtn = document.getElementById('restart-name-btn');
 
   function showScreen(el){
-    [screenLanding, screenName, screenQuiz, screenResults].forEach(s => s.classList.remove('active'));
+    [screenName, screenQuiz, screenResults].forEach(s => s.classList.remove('active'));
     el.classList.add('active');
   }
-
-  /* ---------------- LANDING SCREEN ---------------- */
-  choiceQuizBtn.addEventListener('click', function(){
-    showScreen(screenName);
-    nameInput.focus();
-  });
-
-  choiceLabBtn.addEventListener('click', function(){
-    window.location.href = 'lab/index.html';
-  });
 
   /* ---------------- NAME SCREEN ---------------- */
   gradeOptions.forEach(btn => {
@@ -877,26 +778,18 @@
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
-  function sendResultsToForm(data){
-    if(!GOOGLE_FORM_ID || GOOGLE_FORM_ID.indexOf('PASTE_YOUR') === 0){
-      return; // no Google Form configured yet
+  function sendResultsToSheet(payload){
+    if(!SHEET_WEBHOOK_URL || SHEET_WEBHOOK_URL.indexOf('PASTE_YOUR') === 0){
+      return; // no webhook configured yet
     }
-
-    const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
-    const params = new URLSearchParams();
-    params.append(`entry.${FORM_ENTRY_IDS.name}`, data.name);
-    params.append(`entry.${FORM_ENTRY_IDS.grade}`, data.grade);
-    params.append(`entry.${FORM_ENTRY_IDS.score}`, data.score);
-    params.append(`entry.${FORM_ENTRY_IDS.timeTaken}`, data.timeTaken);
-
-    // "no-cors" is required for Google Forms submissions from another domain;
-    // we can't read the response, but the submission still goes through.
-    fetch(formUrl, {
+    // "no-cors" + text/plain avoids a CORS preflight; we don't need to read the response.
+    fetch(SHEET_WEBHOOK_URL, {
       method: 'POST',
       mode: 'no-cors',
-      body: params
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
     }).catch(function(err){
-      console.warn('Could not send results to Google Form:', err);
+      console.warn('Could not send results to Google Sheet:', err);
     });
   }
 
@@ -907,11 +800,13 @@
     const timeTakenMs = Date.now() - quizStartTime;
     const timeTakenLabel = formatDuration(timeTakenMs);
 
-    sendResultsToForm({
+    sendResultsToSheet({
       name: studentName,
       grade: studentGrade,
-      score: `${score}/${TOTAL}`,
-      timeTaken: timeTakenLabel
+      score: score,
+      total: TOTAL,
+      timeTaken: timeTakenLabel,
+      timestamp: new Date().toISOString()
     });
 
     const pct = Math.round((score / TOTAL) * 100);
