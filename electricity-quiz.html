@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ Electricity Fundamentals Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#0f0c29;
+    --bg-2:#302b63;
+    --bg-3:#24243e;
+    --accent:#00e5ff;
+    --accent-2:#7b2ff7;
+    --yellow:#ffd60a;
+    --green:#2ecc71;
+    --red:#ff5470;
+    --card-bg:rgba(255,255,255,0.06);
+    --card-border:rgba(255,255,255,0.14);
+    --text:#f4f4fb;
+    --muted:#b7b3d8;
+    --radius:22px;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+    font-family:'Nunito', sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(0,229,255,0.18), transparent 40%),
+      radial-gradient(circle at 85% 10%, rgba(123,47,247,0.25), transparent 45%),
+      radial-gradient(circle at 50% 90%, rgba(255,214,10,0.10), transparent 40%),
+      linear-gradient(135deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
+    background-attachment:fixed;
+    overflow-x:hidden;
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    position:relative;
+  }
+
+  /* floating bolts background decoration */
+  .bolt-decor{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+  }
+  .bolt-decor span{
+    position:absolute;
+    font-size:28px;
+    opacity:0.12;
+    animation:float 9s ease-in-out infinite;
+  }
+  .bolt-decor span:nth-child(1){top:8%; left:6%; animation-delay:0s;}
+  .bolt-decor span:nth-child(2){top:70%; left:12%; animation-delay:1.5s; font-size:20px;}
+  .bolt-decor span:nth-child(3){top:20%; left:88%; animation-delay:0.7s;}
+  .bolt-decor span:nth-child(4){top:80%; left:80%; animation-delay:2.2s; font-size:34px;}
+  .bolt-decor span:nth-child(5){top:45%; left:50%; animation-delay:3s; font-size:16px;}
+
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-24px) rotate(8deg);}
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:640px;
+  }
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-radius:var(--radius);
+    padding:38px 34px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+    animation:pop-in 0.5s cubic-bezier(.2,.9,.3,1.2);
+  }
+
+  @keyframes pop-in{
+    from{opacity:0; transform:translateY(18px) scale(0.97);}
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  h1{
+    font-family:'Baloo 2', sans-serif;
+    font-size:1.9rem;
+    margin:0 0 6px;
+    line-height:1.2;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .subtitle{
+    color:var(--muted);
+    font-size:1rem;
+    margin:0 0 26px;
+  }
+
+  .badge-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+  }
+  .badge{
+    background:rgba(255,255,255,0.08);
+    border:1px solid var(--card-border);
+    padding:6px 12px;
+    border-radius:100px;
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--muted);
+  }
+
+  label{
+    display:block;
+    font-weight:800;
+    font-family:'Baloo 2', sans-serif;
+    margin-bottom:10px;
+    font-size:1.05rem;
+  }
+
+  input[type="text"]{
+    width:100%;
+    padding:16px 18px;
+    border-radius:14px;
+    border:2px solid var(--card-border);
+    background:rgba(255,255,255,0.07);
+    color:var(--text);
+    font-size:1.05rem;
+    font-family:'Nunito', sans-serif;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]::placeholder{color:rgba(244,244,251,0.4);}
+  input[type="text"]:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px rgba(0,229,255,0.15);
+  }
+
+  .error-text{
+    color:var(--red);
+    font-size:0.9rem;
+    font-weight:700;
+    margin-top:8px;
+    min-height:18px;
+  }
+
+  #grade-label{margin-top:22px;}
+
+  .grade-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  .grade-option{
+    appearance:none;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding:16px 12px;
+    border-radius:14px;
+    border:2px solid var(--card-border);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1rem;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .grade-option .grade-emoji{font-size:1.6rem;}
+  .grade-option:hover{
+    border-color:var(--accent);
+    background:rgba(0,229,255,0.08);
+    transform:translateY(-1px);
+  }
+  .grade-option.selected{
+    border-color:var(--accent);
+    background:linear-gradient(135deg, rgba(0,229,255,0.18), rgba(123,47,247,0.18));
+    box-shadow:0 0 0 3px rgba(0,229,255,0.15);
+  }
+
+  .btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    letter-spacing:0.3px;
+    border-radius:14px;
+    padding:15px 26px;
+    color:#0b0b1e;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    box-shadow:0 10px 25px rgba(123,47,247,0.35);
+    transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    width:100%;
+    margin-top:22px;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 14px 30px rgba(123,47,247,0.45);}
+  .btn:active:not(:disabled){transform:translateY(0px) scale(0.99);}
+  .btn:disabled{opacity:0.45; cursor:not-allowed; box-shadow:none;}
+
+  .btn.secondary{
+    background:rgba(255,255,255,0.08);
+    color:var(--text);
+    border:2px solid var(--card-border);
+    box-shadow:none;
+  }
+  .btn.secondary:hover{border-color:var(--accent);}
+
+  /* ---------- QUIZ SCREEN ---------- */
+  .student-tag{
+    display:inline-block;
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--muted);
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--card-border);
+    padding:5px 12px;
+    border-radius:100px;
+    margin-bottom:14px;
+  }
+
+  .quiz-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    color:var(--muted);
+    font-size:0.95rem;
+  }
+
+  .progress-track{
+    height:10px;
+    width:100%;
+    background:rgba(255,255,255,0.08);
+    border-radius:100px;
+    overflow:hidden;
+    margin-bottom:26px;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    border-radius:100px;
+    background:linear-gradient(90deg, var(--accent), var(--yellow));
+    transition:width .4s ease;
+  }
+
+  .question-text{
+    font-family:'Baloo 2', sans-serif;
+    font-size:1.3rem;
+    margin:0 0 22px;
+    line-height:1.45;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .option{
+    text-align:left;
+    padding:15px 18px;
+    border-radius:14px;
+    border:2px solid var(--card-border);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    font-family:'Nunito', sans-serif;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .option:hover:not(.locked){
+    border-color:var(--accent);
+    background:rgba(0,229,255,0.08);
+    transform:translateX(2px);
+  }
+  .option .opt-letter{
+    width:28px;
+    height:28px;
+    min-width:28px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:0.9rem;
+  }
+  .option.correct{
+    border-color:var(--green);
+    background:rgba(46,204,113,0.16);
+  }
+  .option.correct .opt-letter{background:var(--green); color:#06210f;}
+  .option.wrong{
+    border-color:var(--red);
+    background:rgba(255,84,112,0.14);
+  }
+  .option.wrong .opt-letter{background:var(--red); color:#2c0611;}
+  .option.locked{cursor:default;}
+
+  .feedback-box{
+    margin-top:18px;
+    padding:14px 16px;
+    border-radius:14px;
+    font-size:0.92rem;
+    font-weight:600;
+    line-height:1.5;
+    display:none;
+  }
+  .feedback-box.show{display:block; animation:pop-in .3s ease;}
+  .feedback-box.good{background:rgba(46,204,113,0.14); border:1px solid rgba(46,204,113,0.4); color:#c9f7d9;}
+  .feedback-box.bad{background:rgba(255,84,112,0.12); border:1px solid rgba(255,84,112,0.4); color:#ffd6de;}
+
+  /* ---------- RESULTS SCREEN ---------- */
+  .score-hero{
+    text-align:center;
+    margin-bottom:24px;
+  }
+  .score-ring{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    margin:0 auto 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:conic-gradient(var(--accent) calc(var(--pct,0)*1%), rgba(255,255,255,0.08) 0);
+    position:relative;
+  }
+  .score-ring::before{
+    content:"";
+    position:absolute;
+    inset:10px;
+    border-radius:50%;
+    background:var(--bg-3);
+  }
+  .score-ring .score-num{
+    position:relative;
+    font-family:'Baloo 2', sans-serif;
+    font-size:2.1rem;
+    font-weight:800;
+  }
+  .score-ring .score-num span{
+    display:block;
+    font-size:0.85rem;
+    color:var(--muted);
+    font-weight:600;
+  }
+
+  .result-title{
+    font-family:'Baloo 2', sans-serif;
+    font-size:1.5rem;
+    margin:0 0 8px;
+  }
+  .result-msg{
+    color:var(--muted);
+    font-size:1rem;
+    line-height:1.55;
+    margin:0 auto;
+    max-width:440px;
+  }
+
+  .review-list{
+    margin-top:26px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    max-height:320px;
+    overflow-y:auto;
+    padding-right:4px;
+  }
+  .review-item{
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid var(--card-border);
+    background:rgba(255,255,255,0.04);
+  }
+  .review-item.correct{border-left:4px solid var(--green);}
+  .review-item.incorrect{border-left:4px solid var(--red);}
+  .review-q{font-weight:700; font-size:0.92rem; margin-bottom:6px;}
+  .review-a{font-size:0.85rem; color:var(--muted); line-height:1.5;}
+  .review-a b{color:var(--text);}
+  .review-icon{margin-right:6px;}
+
+  .action-row{
+    display:flex;
+    gap:12px;
+    margin-top:26px;
+  }
+  .action-row .btn{margin-top:0;}
+
+  /* confetti canvas */
+  #confetti-canvas{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:5;
+  }
+
+  .trophy-pop{
+    font-size:4rem;
+    text-align:center;
+    margin-bottom:6px;
+    animation:trophy-bounce 1s ease;
+  }
+  @keyframes trophy-bounce{
+    0%{transform:scale(0) rotate(-15deg); opacity:0;}
+    50%{transform:scale(1.25) rotate(8deg); opacity:1;}
+    75%{transform:scale(0.95) rotate(-4deg);}
+    100%{transform:scale(1) rotate(0deg);}
+  }
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15); border-radius:8px;}
+
+  @media (max-width:480px){
+    .card{padding:28px 20px;}
+    h1{font-size:1.5rem;}
+    .action-row{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bolt-decor" aria-hidden="true">
+  <span>⚡</span><span>💡</span><span>🔋</span><span>⚡</span><span>🔌</span>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="app">
+  <div class="card">
+
+    <!-- SCREEN 1: NAME ENTRY -->
+    <section id="screen-name" class="screen active">
+      <div class="badge-row">
+        <span class="badge">⚡ 10 Questions</span>
+        <span class="badge">🔋 V · I · R</span>
+        <span class="badge">💡 LEDs & Ohm's Law</span>
+      </div>
+      <h1>Electricity Fundamentals Quiz</h1>
+      <p class="subtitle">Test your knowledge of voltage, current, resistance, LEDs, and Ohm's Law. Let's see how bright you shine! ⚡</p>
+
+      <label for="student-name">What's your name?</label>
+      <input type="text" id="student-name" placeholder="Type your name here..." maxlength="40" autocomplete="off">
+      <div class="error-text" id="name-error"></div>
+
+      <label id="grade-label">What's your grade?</label>
+      <div class="grade-row" role="group" aria-labelledby="grade-label">
+        <button type="button" class="grade-option" data-grade="Grade 7">
+          <span class="grade-emoji">🎒</span>
+          <span>Grade 7</span>
+        </button>
+        <button type="button" class="grade-option" data-grade="Grade 8">
+          <span class="grade-emoji">📘</span>
+          <span>Grade 8</span>
+        </button>
+      </div>
+      <div class="error-text" id="grade-error"></div>
+
+      <button class="btn" id="start-btn">Start Quiz 🚀</button>
+    </section>
+
+    <!-- SCREEN 2: QUIZ -->
+    <section id="screen-quiz" class="screen">
+      <div class="student-tag" id="student-tag">Nada · Grade 7</div>
+      <div class="quiz-top">
+        <span id="quiz-progress-label">Question 1 / 10</span>
+        <span id="quiz-score-label">Score: 0</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+
+      <p class="question-text" id="question-text">Question text</p>
+      <div class="options" id="options-container"></div>
+
+      <div class="feedback-box" id="feedback-box"></div>
+
+      <button class="btn" id="next-btn" disabled>Next ➜</button>
+    </section>
+
+    <!-- SCREEN 3: RESULTS -->
+    <section id="screen-results" class="screen">
+      <div id="trophy-slot"></div>
+      <div class="score-hero">
+        <div class="score-ring" id="score-ring">
+          <div class="score-num" id="score-num">0/10<span>correct</span></div>
+        </div>
+        <h2 class="result-title" id="result-title">Nice work!</h2>
+        <p class="result-msg" id="result-msg">Message goes here.</p>
+      </div>
+
+      <div class="review-list" id="review-list"></div>
+
+      <div class="action-row">
+        <button class="btn secondary" id="retry-btn">Try Again 🔄</button>
+        <button class="btn" id="restart-name-btn">New Student 👤</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- QUIZ DATA ---------------- */
+  const QUESTIONS = [
+    {
+      q: "What does the symbol \"V\" represent in an electrical circuit?",
+      options: ["Volume", "Voltage", "Velocity", "Vacuum"],
+      correct: 1,
+      explain: "V stands for Voltage — the electrical \"push\" (potential difference) that drives current through a circuit, measured in volts."
+    },
+    {
+      q: "Which unit is used to measure electric current?",
+      options: ["Ohm (Ω)", "Volt (V)", "Ampere (A)", "Watt (W)"],
+      correct: 2,
+      explain: "Electric current is measured in Amperes (A) — it tells us how much charge flows past a point per second."
+    },
+    {
+      q: "Which unit is used to measure electrical resistance?",
+      options: ["Ohm (Ω)", "Ampere (A)", "Volt (V)", "Farad (F)"],
+      correct: 0,
+      explain: "Resistance is measured in Ohms (Ω). It describes how much a component opposes the flow of current."
+    },
+    {
+      q: "What is Ohm's Law?",
+      options: ["V = I + R", "I = V × R", "V = I × R", "R = I × I"],
+      correct: 2,
+      explain: "Ohm's Law states V = I × R (Voltage = Current × Resistance) — the foundation for analyzing simple circuits."
+    },
+    {
+      q: "A circuit has a voltage of 12V and a current of 2A. What is the resistance?",
+      options: ["6 Ω", "24 Ω", "10 Ω", "14 Ω"],
+      correct: 0,
+      explain: "Using R = V / I → R = 12V / 2A = 6 Ω."
+    },
+    {
+      q: "What is the main job of an LED in a circuit?",
+      options: ["To store extra electricity", "To give off light when current flows through it", "To increase the circuit's resistance", "To block all current from flowing"],
+      correct: 1,
+      explain: "LED stands for Light Emitting Diode — its job is to glow and give off light when electric current passes through it."
+    },
+    {
+      q: "Why do LEDs usually need a resistor connected in series with them?",
+      options: [
+        "To make the LED brighter",
+        "To limit the current and prevent the LED from burning out",
+        "To change the LED's color",
+        "Resistors are not needed with LEDs"
+      ],
+      correct: 1,
+      explain: "LEDs have very low resistance, so without a current-limiting resistor, too much current would flow and damage the LED."
+    },
+    {
+      q: "What is an open circuit?",
+      options: [
+        "A circuit where the path is broken, so current cannot flow",
+        "A circuit with too much voltage",
+        "A circuit with no resistance at all",
+        "A circuit that is always switched on"
+      ],
+      correct: 0,
+      explain: "An open circuit has a break in its path — like an open switch or a loose wire — so current can't flow and things like LEDs won't light up."
+    },
+    {
+      q: "If voltage stays constant but resistance increases, what happens to the current?",
+      options: ["It increases", "It decreases", "It stays the same", "It becomes negative"],
+      correct: 1,
+      explain: "From I = V / R, if V is constant and R goes up, I must go down — resistance and current are inversely related."
+    },
+    {
+      q: "What do we call the flow of electric charge through a wire?",
+      options: ["Voltage", "Resistance", "Current", "Power"],
+      correct: 2,
+      explain: "The flow of electric charge through a wire is called current, measured in Amperes (A)."
+    }
+  ];
+
+  const TOTAL = QUESTIONS.length;
+
+  /* ---------------- GOOGLE SHEET CONFIG ----------------
+     Paste your Apps Script Web App URL below (see setup instructions).
+     Leave it as-is and results simply won't be sent anywhere. */
+  const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby1bnbEPoPvjz9ak68sFeWqwCiuB7y3mZZ8xPSshoJu79hkagTXAB6KQj02BRWMziljCg/exec";
+
+  /* ---------------- STATE ---------------- */
+  let studentName = "";
+  let studentGrade = "";
+  let currentIndex = 0;
+  let score = 0;
+  let userAnswers = []; // { selected, correct: bool }
+  let locked = false;
+  let quizStartTime = 0;
+
+  /* ---------------- DOM REFS ---------------- */
+  const screenName = document.getElementById('screen-name');
+  const screenQuiz = document.getElementById('screen-quiz');
+  const screenResults = document.getElementById('screen-results');
+
+  const nameInput = document.getElementById('student-name');
+  const nameError = document.getElementById('name-error');
+  const gradeOptions = document.querySelectorAll('.grade-option');
+  const gradeError = document.getElementById('grade-error');
+  const startBtn = document.getElementById('start-btn');
+
+  const studentTag = document.getElementById('student-tag');
+  const progressLabel = document.getElementById('quiz-progress-label');
+  const scoreLabel = document.getElementById('quiz-score-label');
+  const progressFill = document.getElementById('progress-fill');
+  const questionText = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const feedbackBox = document.getElementById('feedback-box');
+  const nextBtn = document.getElementById('next-btn');
+
+  const scoreRing = document.getElementById('score-ring');
+  const scoreNum = document.getElementById('score-num');
+  const resultTitle = document.getElementById('result-title');
+  const resultMsg = document.getElementById('result-msg');
+  const reviewList = document.getElementById('review-list');
+  const trophySlot = document.getElementById('trophy-slot');
+  const retryBtn = document.getElementById('retry-btn');
+  const restartNameBtn = document.getElementById('restart-name-btn');
+
+  function showScreen(el){
+    [screenName, screenQuiz, screenResults].forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  /* ---------------- NAME SCREEN ---------------- */
+  gradeOptions.forEach(btn => {
+    btn.addEventListener('click', function(){
+      gradeOptions.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      studentGrade = btn.dataset.grade;
+      gradeError.textContent = "";
+    });
+  });
+
+  function tryStart(){
+    const val = nameInput.value.trim();
+    if(!val){
+      nameError.textContent = "Please enter your name to start the quiz.";
+      nameInput.focus();
+      return;
+    }
+    nameError.textContent = "";
+
+    if(!studentGrade){
+      gradeError.textContent = "Please select your grade to start the quiz.";
+      return;
+    }
+    gradeError.textContent = "";
+
+    studentName = val;
+    currentIndex = 0;
+    score = 0;
+    userAnswers = [];
+    quizStartTime = Date.now();
+    showScreen(screenQuiz);
+    renderQuestion();
+  }
+
+  startBtn.addEventListener('click', tryStart);
+  nameInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') tryStart();
+  });
+
+  /* ---------------- QUIZ SCREEN ---------------- */
+  function renderQuestion(){
+    locked = false;
+    const q = QUESTIONS[currentIndex];
+    studentTag.textContent = `${studentName} · ${studentGrade}`;
+    progressLabel.textContent = `Question ${currentIndex + 1} / ${TOTAL}`;
+    scoreLabel.textContent = `Score: ${score}`;
+    progressFill.style.width = `${(currentIndex / TOTAL) * 100}%`;
+    questionText.textContent = q.q;
+    feedbackBox.className = 'feedback-box';
+    feedbackBox.textContent = '';
+
+    optionsContainer.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.type = 'button';
+      btn.innerHTML = `<span class="opt-letter">${letters[idx]}</span><span>${opt}</span>`;
+      btn.addEventListener('click', () => selectOption(idx, btn));
+      optionsContainer.appendChild(btn);
+    });
+
+    nextBtn.disabled = true;
+    nextBtn.textContent = (currentIndex === TOTAL - 1) ? 'See Results 🏁' : 'Next ➜';
+  }
+
+  function selectOption(idx, btnEl){
+    if(locked) return;
+    locked = true;
+
+    const q = QUESTIONS[currentIndex];
+    const isCorrect = idx === q.correct;
+    if(isCorrect) score++;
+
+    userAnswers.push({
+      question: q.q,
+      selected: q.options[idx],
+      correctAnswer: q.options[q.correct],
+      isCorrect
+    });
+
+    const optionButtons = optionsContainer.querySelectorAll('.option');
+    optionButtons.forEach((b, i) => {
+      b.classList.add('locked');
+      if(i === q.correct) b.classList.add('correct');
+      if(i === idx && !isCorrect) b.classList.add('wrong');
+    });
+
+    feedbackBox.classList.add('show', isCorrect ? 'good' : 'bad');
+    feedbackBox.textContent = (isCorrect ? "✅ Correct! " : "❌ Not quite. ") + q.explain;
+
+    scoreLabel.textContent = `Score: ${score}`;
+    nextBtn.disabled = false;
+  }
+
+  nextBtn.addEventListener('click', function(){
+    if(currentIndex < TOTAL - 1){
+      currentIndex++;
+      renderQuestion();
+    } else {
+      progressFill.style.width = '100%';
+      showResults();
+    }
+  });
+
+  /* ---------------- GOOGLE SHEET LOGGING ---------------- */
+  function formatDuration(ms){
+    const totalSeconds = Math.max(0, Math.round(ms / 1000));
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  function sendResultsToSheet(payload){
+    if(!SHEET_WEBHOOK_URL || SHEET_WEBHOOK_URL.indexOf('PASTE_YOUR') === 0){
+      return; // no webhook configured yet
+    }
+    // "no-cors" + text/plain avoids a CORS preflight; we don't need to read the response.
+    fetch(SHEET_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).catch(function(err){
+      console.warn('Could not send results to Google Sheet:', err);
+    });
+  }
+
+  /* ---------------- RESULTS SCREEN ---------------- */
+  function showResults(){
+    showScreen(screenResults);
+
+    const timeTakenMs = Date.now() - quizStartTime;
+    const timeTakenLabel = formatDuration(timeTakenMs);
+
+    sendResultsToSheet({
+      name: studentName,
+      grade: studentGrade,
+      score: score,
+      total: TOTAL,
+      timeTaken: timeTakenLabel,
+      timestamp: new Date().toISOString()
+    });
+
+    const pct = Math.round((score / TOTAL) * 100);
+    scoreRing.style.setProperty('--pct', pct);
+    scoreNum.innerHTML = `${score}/${TOTAL}<span>correct</span>`;
+
+    const allCorrect = score === TOTAL;
+    const doingWell = score >= TOTAL * 0.7 && !allCorrect;
+
+    trophySlot.innerHTML = '';
+    reviewList.innerHTML = '';
+
+    if(allCorrect){
+      trophySlot.innerHTML = '<div class="trophy-pop">🏆</div>';
+      resultTitle.textContent = `Amazing, ${studentName}! Perfect Score! ⚡🎉`;
+      resultMsg.textContent = `You answered all ${TOTAL} questions correctly. You've truly mastered Voltage, Current, Resistance, LEDs, and Ohm's Law. Great job!`;
+      launchConfetti();
+    } else if(doingWell){
+      resultTitle.textContent = `Well done, ${studentName}! 👏`;
+      resultMsg.textContent = `You scored ${score} out of ${TOTAL}. You're doing great — just a couple of concepts to brush up on. Check the review below and give it another go!`;
+    } else {
+      resultTitle.textContent = `Good try, ${studentName}! 💪`;
+      resultMsg.textContent = `You scored ${score} out of ${TOTAL}. Don't worry — electricity fundamentals take practice! Review the answers below, and try again whenever you're ready. You've got this!`;
+    }
+
+    userAnswers.forEach((a, i) => {
+      const item = document.createElement('div');
+      item.className = 'review-item ' + (a.isCorrect ? 'correct' : 'incorrect');
+      item.innerHTML = `
+        <div class="review-q">${i + 1}. ${a.question}</div>
+        <div class="review-a">
+          <span class="review-icon">${a.isCorrect ? '✅' : '❌'}</span>
+          Your answer: <b>${a.selected}</b>
+          ${a.isCorrect ? '' : `<br>Correct answer: <b>${a.correctAnswer}</b>`}
+        </div>
+      `;
+      reviewList.appendChild(item);
+    });
+  }
+
+  retryBtn.addEventListener('click', function(){
+    currentIndex = 0;
+    score = 0;
+    userAnswers = [];
+    quizStartTime = Date.now();
+    showScreen(screenQuiz);
+    renderQuestion();
+  });
+
+  restartNameBtn.addEventListener('click', function(){
+    nameInput.value = '';
+    studentGrade = '';
+    gradeOptions.forEach(b => b.classList.remove('selected'));
+    gradeError.textContent = '';
+    showScreen(screenName);
+    nameInput.focus();
+  });
+
+  /* ---------------- CONFETTI ---------------- */
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let confettiParticles = [];
+  let confettiAnimId = null;
+
+  function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  const CONFETTI_COLORS = ['#00e5ff', '#7b2ff7', '#ffd60a', '#ff5470', '#2ecc71', '#ffffff'];
+
+  function launchConfetti(){
+    confettiParticles = [];
+    const count = 160;
+    for(let i = 0; i < count; i++){
+      confettiParticles.push({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * canvas.height * 0.5,
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 10,
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+        speedY: 2 + Math.random() * 3.5,
+        speedX: -1.5 + Math.random() * 3,
+        rotation: Math.random() * 360,
+        rotationSpeed: -6 + Math.random() * 12,
+        opacity: 1
+      });
+    }
+    const startTime = Date.now();
+    const duration = 4200;
+
+    if(confettiAnimId) cancelAnimationFrame(confettiAnimId);
+
+    function frame(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const elapsed = Date.now() - startTime;
+      const fadeStart = duration - 900;
+
+      confettiParticles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.rotation += p.rotationSpeed;
+        if(elapsed > fadeStart){
+          p.opacity = Math.max(0, 1 - (elapsed - fadeStart) / 900);
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+
+      if(elapsed < duration){
+        confettiAnimId = requestAnimationFrame(frame);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    frame();
+  }
+
+})();
+</script>
+
+</body>
+</html>
